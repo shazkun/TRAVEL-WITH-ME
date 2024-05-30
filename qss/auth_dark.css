@@ -1,0 +1,94 @@
+QMainWindow {
+    border-image: url(:/img/BGMAIN.jpg);
+}
+
+QFrame#frame_2,
+#frame_3 {
+    background-color: #24293e;
+    border: 1px solid white;
+    border-radius: 20px;
+}
+
+#L1 ,#L2{
+
+    background: transparent;
+    background-color: #f4f5fc;
+    color: black;
+    border: transparent;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 80px;
+
+}
+
+#R1,#R2 {
+
+    background: transparent;
+    background-color: #f4f5fc;
+    color: black;
+    border: transparent;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-right: 80px;
+
+}
+
+QPushButton:hover {
+    font-weight: bold;
+}
+
+
+QLineEdit {
+    background-color: #f4f5fc;
+    font: 75 italic 10pt "Gill Sans MT";
+    color: black;
+    border: none;
+    border: 1.75px solid white;
+    border-color: #f4f5fc;
+    border-radius: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-right: 80px;
+    margin-left: 80px;
+    padding-left: 30px;
+
+}
+
+#albtn,
+#cabtn {
+    color: #f4f5fc;
+    background: transparent
+}
+
+QPushButton#registerbtn,
+#loginb {
+    background-color: #FFFFFF;
+    border: 1px solid hsl(0, 0%, 13%);
+    border-radius: 8px;
+    color: #222222;
+    margin-left: 200px;
+    margin-right: 200px;
+
+
+}
+
+QPushButton#registerbtn,
+#loginb:hover {
+    background-color: #F7F7F7;
+}
+
+QPushButton#registerbtn,
+#loginb:pressed {
+    background-color: #F7F7F7;
+    border-color: #000000;
+}
+
+#TITLE,
+#TITLE_2 {
+    color: #f4f5fc;
+    font: 75 20pt "Georgia";
+}
