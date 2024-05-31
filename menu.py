@@ -33,7 +33,6 @@ class Main(QMainWindow, BaseWindow):
         self.setBackground()
         self.abg = authentication.AuthWindow()
         self.abg.setBackground(self.user_id)
-        self.load_profiles()
 
     def table_flags(self):
         self.tableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
@@ -64,20 +63,6 @@ class Main(QMainWindow, BaseWindow):
         self.delbtn.clicked.connect(self.delete_btn)
         self.calendarWidget.clicked.connect(self.calendarDateChanged)
         self.tabWidget.currentChanged.connect(self.calendarDateChanged)
-
-    def load_profiles(self):
-        users = ["User1", "User2", "User3", "User4", "User5", "User6", "User7", "User8", "User9", "User10",
-                 "User11", "User12", "User13", "User14", "User15", "User16", "User17", "User18"]  # Example user names
-        profileImagePath = 'icons/client.png'
-        row = 0
-        col = 0
-        for user in users:
-            userProfileWidget = UserProfileWidget(user, profileImagePath)
-            self.profile_layout.addWidget(userProfileWidget, row, col)
-            col += 1
-            if col == 3:
-                col = 0
-                row += 1
 
     def toggle_mode(self):
         # Get the current dark mode value from the database
@@ -127,6 +112,7 @@ class Main(QMainWindow, BaseWindow):
     def calendarDateChanged(self):
         selected = self.calendarWidget.selectedDate().toString("yyyy-MM-dd")
     #     self.updateScheduleList(selected)
+        self.load_profiles(selected)
 
     # def updateScheduleList(self, date):
     #     self.listWidget.clear()  # Clear existing items
@@ -138,6 +124,31 @@ class Main(QMainWindow, BaseWindow):
     #         item_text = f"{c_id} Location: {location} Destination: {destination}"
     #         list_item = QListWidgetItem(item_text)
     #         self.listWidget.addItem(list_item)
+    def load_profiles(self, date):
+        self.clear_layout(self.profile_layout)
+        clients = self.db.fetch_user_clients_by_date(self.user_id, date)
+        profileImagePath = 'icons/client.png'
+        row = 0
+        col = 0
+        clients = self.db.fetch_user_clients_by_date(self.user_id, date)
+        for user in clients:
+            userProfileWidget = UserProfileWidget(str(user[0]), profileImagePath, self.user_id, self.db)
+            if user:
+                self.profile_layout.addWidget(userProfileWidget, row, col)
+            else:
+                self.profile_layout.addWidget('1', row, col)
+            col += 1
+            if col == 3:
+                col = 0
+                row += 1
+    def clear_layout(self, layout):
+        while layout.count():
+            item = layout.takeAt(0)
+            widget = item.widget()
+            if widget is not None:
+                widget.deleteLater()
+            else:
+                self.clear_layout(item.layout())
 
     # ADD CLIENT FUNCTION
 
@@ -147,7 +158,7 @@ class Main(QMainWindow, BaseWindow):
         self.main.show()
 
     def view_packages(self):
-        self.main = PackageWindow()
+        self.main = PackageWindow(self.db, self.user_id)
         self.main.setWindowModality(Qt.ApplicationModal)
         self.main.show()
 
@@ -240,10 +251,12 @@ class Main(QMainWindow, BaseWindow):
 
 
 class UserProfileWidget(QFrame):
-    def __init__(self, userName, profileImagePath):
+    def __init__(self, userName, profileImagePath, user_id, db):
         super().__init__()
         self.userName = userName
         self.profileImagePath = profileImagePath
+        self.user_id = user_id
+        self.db = db
 
         # Load the profile image and scale it to fit within 50x50 without cropping
         pixmap = QPixmap(profileImagePath)
@@ -279,3 +292,18 @@ class UserProfileWidget(QFrame):
                 background-color: #e0e0e0;
             }
         """)
+
+    def mousePressEvent(self, event):
+        current_details = self.db.fetch_user_clients_one(self.user_id, int(self.userNameLabel.text()))  
+        self.details = DetailsProfile()
+        self.details.setWindowModality(Qt.ApplicationModal)
+        self.details.name.setText(current_details.get('name', ''))
+        self.details.contact.setText(current_details.get('contact', ''))
+        self.details.date.setText(current_details.get('date', ''))
+        self.details.time.setText(current_details.get('time', ''))
+        self.details.pax.setText(current_details.get('pax', ''))
+        self.details.location.setText(current_details.get('location', ''))
+        self.details.type.setText(current_details.get('type', ''))
+        self.details.destination.setText(current_details.get('destination', ''))
+        self.details.show()
+        print(f"{self.userName} clicked")

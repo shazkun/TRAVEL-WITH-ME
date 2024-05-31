@@ -6,20 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>386</height>
+    <width>401</width>
+    <height>701</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>400</width>
-    <height>386</height>
+    <width>401</width>
+    <height>701</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>400</width>
-    <height>386</height>
+    <width>401</width>
+    <height>701</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -119,14 +119,14 @@ QComboBox QAbstractItemView {
     <widget class="QFrame" name="frame">
      <property name="minimumSize">
       <size>
-       <width>0</width>
-       <height>0</height>
+       <width>401</width>
+       <height>701</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>400</width>
-       <height>386</height>
+       <width>401</width>
+       <height>701</height>
       </size>
      </property>
      <property name="styleSheet">
@@ -141,12 +141,6 @@ QComboBox QAbstractItemView {
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <widget class="QLabel" name="label">
-        <property name="minimumSize">
-         <size>
-          <width>380</width>
-          <height>50</height>
-         </size>
-        </property>
         <property name="maximumSize">
          <size>
           <width>1000</width>
@@ -186,7 +180,7 @@ QLabel[info=&quot;true&quot;] {
 </string>
         </property>
         <property name="text">
-         <string>ADD PACKAGE</string>
+         <string>CLIENT DETAILS</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -194,12 +188,96 @@ QLabel[info=&quot;true&quot;] {
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="package_2">
+       <widget class="QLineEdit" name="name">
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+        <property name="placeholderText">
+         <string>Name</string>
+        </property>
+        <property name="cursorMoveStyle">
+         <enum>Qt::LogicalMoveStyle</enum>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="contact">
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+        <property name="placeholderText">
+         <string>Contact Number</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="date">
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+        <property name="placeholderText">
+         <string>Date of Pickup</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="time">
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+        <property name="placeholderText">
+         <string>Time of Pickup</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="pax">
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+        <property name="placeholderText">
+         <string>Number of Clients(PAX)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="location">
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+        <property name="placeholderText">
+         <string>Location of Pickup</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="type">
         <property name="alignment">
          <set>Qt::AlignCenter</set>
         </property>
         <property name="placeholderText">
-         <string>PACKAGE TYPE</string>
+         <string>Package Type</string>
         </property>
        </widget>
       </item>
@@ -208,73 +286,13 @@ QLabel[info=&quot;true&quot;] {
         <property name="alignment">
          <set>Qt::AlignCenter</set>
         </property>
-        <property name="placeholderText">
-         <string>DESTINATION</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="cost">
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
         <property name="placeholderText">
-         <string>COST</string>
+         <string>Destination</string>
         </property>
        </widget>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <property name="sizeConstraint">
-         <enum>QLayout::SetDefaultConstraint</enum>
-        </property>
-        <item>
-         <widget class="QPushButton" name="savebutton">
-          <property name="styleSheet">
-           <string notr="true">QPushButton{
-
-border-radius: 25px;
-color: white;
-background-color: #24293e;
-padding-top: 20px;
-padding-bottom: 20px;
-
-
-
-
-
-
-}</string>
-          </property>
-          <property name="text">
-           <string>SAVE</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="cancelbutton">
-          <property name="styleSheet">
-           <string notr="true">QPushButton{
-
-border-radius: 25px;
-color: white;
-background-color: #24293e;
-padding-top: 20px;
-padding-bottom: 20px;
-
-
-
-
-
-
-}</string>
-          </property>
-          <property name="text">
-           <string>CANCEL</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
       </item>
      </layout>
     </widget>

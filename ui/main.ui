@@ -445,7 +445,7 @@ QScrollBar::sub-page:horizontal {
         <string notr="true"/>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>2</number>
        </property>
        <widget class="QWidget" name="home">
         <attribute name="title">

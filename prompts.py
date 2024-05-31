@@ -50,7 +50,13 @@ class SuccessPrompt(QDialog):
         main_ui_path = Path(__file__).resolve().parent / 'ui/prompts/success.ui'
         uic.loadUi(main_ui_path, self)
         self.ok.clicked.connect(self.accept)
-   
+
+class DetailsProfile(QDialog):
+    def __init__(self):
+        super(DetailsProfile, self).__init__()
+        main_ui_path = Path(__file__).resolve().parent / 'ui/viewclient.ui'
+        uic.loadUi(main_ui_path, self)
+        
 
 class BaseWindow(QWidget):
     def __init__(self):

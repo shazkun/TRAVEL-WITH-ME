@@ -15,6 +15,17 @@ class DatabaseHandler:
         dark_mode BOOLEAN DEFAULT 0
     )
     ''')
+         
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS packages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            package_type TEXT NOT NULL,
+            destination TEXT NOT NULL,
+            cost TEXT NOT NULL,
+            FOREIGN KEY(user_id) REFERENCES users(id)
+        );
+        """)
         self.cursor.execute('''
         CREATE TABLE IF NOT EXISTS clients (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -104,6 +115,26 @@ class DatabaseHandler:
 
     def delete_client(self, user_id,client_id):
         self.cursor.execute("DELETE FROM clients WHERE user_id = ? AND id = ?", (user_id,client_id))
+        self.conn.commit()
+
+
+    
+    def insert_package(self, user_id, package_type, destination, cost):
+        self.cursor.execute("INSERT INTO packages (user_id, package_type, destination, cost) VALUES (?, ?, ?, ?)",
+                        (user_id, package_type, destination, cost))
+        self.conn.commit()
+
+    def fetch_user_packages(self, user_id):
+        self.cursor.execute("SELECT id, package_type,destination,cost FROM packages WHERE user_id = ?", (user_id,))
+        return  self.cursor.fetchall()
+
+    def update_package(self, package_id, package_type, destination, cost):
+        self.cursor.execute("UPDATE packages SET package_type = ?, destination = ?, cost = ? WHERE id = ?",
+                    (package_type, destination, cost, package_id))
+        self.conn.commit()
+
+    def delete_package(self, package_id):
+        self.cursor.execute("DELETE FROM packages WHERE id = ?", (package_id,))
         self.conn.commit()
     
 
