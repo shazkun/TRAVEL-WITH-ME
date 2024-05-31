@@ -25,7 +25,7 @@
 
     border-image: url(:/img/BGMAIN.jpg);
 }
-#frame_5{
+#scrollArea{
 background-color: white;
 color: black;
 border: 1px solid black
@@ -717,18 +717,33 @@ QScrollBar::sub-page:horizontal {
                </widget>
               </item>
               <item>
-               <widget class="QFrame" name="frame_5">
-                <property name="frameShape">
-                 <enum>QFrame::StyledPanel</enum>
+               <widget class="QScrollArea" name="scrollArea">
+                <property name="widgetResizable">
+                 <bool>true</bool>
                 </property>
-                <property name="frameShadow">
-                 <enum>QFrame::Raised</enum>
-                </property>
-                <layout class="QGridLayout" name="gridLayout_7">
-                 <item row="0" column="0">
-                  <layout class="QGridLayout" name="profilelayout"/>
-                 </item>
-                </layout>
+                <widget class="QWidget" name="scrollcontent">
+                 <property name="geometry">
+                  <rect>
+                   <x>0</x>
+                   <y>0</y>
+                   <width>470</width>
+                   <height>304</height>
+                  </rect>
+                 </property>
+                 <layout class="QGridLayout" name="gridLayout_6">
+                  <item row="0" column="0">
+                   <widget class="QFrame" name="profileframe">
+                    <property name="frameShape">
+                     <enum>QFrame::StyledPanel</enum>
+                    </property>
+                    <property name="frameShadow">
+                     <enum>QFrame::Raised</enum>
+                    </property>
+                    <layout class="QGridLayout" name="gridLayout_7"/>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
                </widget>
               </item>
              </layout>
