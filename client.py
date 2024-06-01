@@ -3,12 +3,13 @@ from PyQt5 import uic
 from pathlib import Path
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QPixmap,QIcon, QRegExpValidator
-from PyQt5.QtCore import Qt, QRegExp
+from PyQt5.QtCore import Qt, QRegExp,QEvent
 from PyQt5.QtWidgets import QWidget
 from prompts import *
 import sys
 import icons.resources_rc
 from database import *
+import re
 
 class ClientWindow(QDialog, BaseWindow):
     def __init__(self, table, db, user_id, selected_date):
@@ -89,7 +90,36 @@ class EditClientWindow(QDialog):
         self.cancelbutton.clicked.connect(self.cancel_btn)
         phone_validator = QRegExpValidator(QRegExp(r'^\d{10}$'))  # Regular expression for a 10-digit phone number
         self.contact.setValidator(phone_validator)
-        
+        self.date.installEventFilter(self)
+
+    def eventFilter(self, source, event):
+        if source is self.date and event.type() == QEvent.MouseButtonPress:
+            self.open_calendar_dialog()
+            return True
+        return super().eventFilter(source, event)
+
+
+
+    def open_calendar_dialog(self):
+        # Open the CalendarEdit dialog
+        dialog = CalendarEdit()
+        if dialog.exec_() == QDialog.Accepted:
+            self.selected_date = dialog.calendarWidget.selectedDate()
+            print("Selected date:", self.selected_date.toString(Qt.ISODate))
+            self.update_date_label()
+        else:
+            print("Dialog canceled")
+
+    def update_date_label(self):
+        # Update the date label with the selected date
+        if self.selected_date is not None:
+            self.date.setText(self.selected_date.toString(Qt.ISODate))
+
+
+    
+       
+
+
 
     def save_btn(self):
         dialog = SavePrompt()
@@ -171,7 +201,9 @@ class ScheduleWindow(QDialog, BaseWindow):
             QMessageBox.warning(self, 'No Selection', 'Please select an item to update.')
             return
         text = selected_items[0].text()
-        client_id = ''.join(filter(str.isdigit, text))
+        match = re.search(r'ID:\s*(\d+)', text)
+        client_id = match.group(1)
+        
         print(client_id)
         selected_date = self.calendarWidget.selectedDate().toString("yyyy-MM-dd")
         current_details = self.db.fetch_user_clients_one(self.user_id, client_id)  
@@ -204,7 +236,7 @@ class ScheduleWindow(QDialog, BaseWindow):
             location = client[6]
             destination = client[-1]  # Adjust index according to your data structure
             
-            item_text = f"{c_id} Location: {location} Destination: {destination}"
+            item_text = f"ID: {c_id} Location: {location} Destination: {destination}"
             list_item = QListWidgetItem(item_text)
             self.listWidget.addItem(list_item)
 

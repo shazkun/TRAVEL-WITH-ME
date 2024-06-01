@@ -267,21 +267,11 @@ QLabel[info=&quot;true&quot;] {
             }</string>
         </property>
         <property name="currentText">
-         <string>DOOR TO DOOR</string>
+         <string/>
         </property>
         <property name="sizeAdjustPolicy">
          <enum>QComboBox::AdjustToContents</enum>
         </property>
-        <item>
-         <property name="text">
-          <string>DOOR TO DOOR</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>BACK AND FOURTH</string>
-         </property>
-        </item>
        </widget>
       </item>
       <item>

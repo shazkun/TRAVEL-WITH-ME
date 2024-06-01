@@ -56,6 +56,14 @@ class DetailsProfile(QDialog):
         super(DetailsProfile, self).__init__()
         main_ui_path = Path(__file__).resolve().parent / 'ui/viewclient.ui'
         uic.loadUi(main_ui_path, self)
+
+class CalendarEdit(QDialog):
+    def __init__(self):
+        super(CalendarEdit, self).__init__()
+        main_ui_path = Path(__file__).resolve().parent / 'ui/calendar.ui'
+        uic.loadUi(main_ui_path, self)
+        self.ok.clicked.connect(self.accept)
+        self.cancel.clicked.connect(self.reject)
         
 
 class BaseWindow(QWidget):
