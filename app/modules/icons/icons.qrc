@@ -1,0 +1,26 @@
+<RCC>
+  <qresource prefix="img">
+    <file>256LOGO2.png</file>
+    <file>256X256LOGO.png</file>
+    <file>1000ptext.png</file>
+    <file>1080pnotext.png</file>
+    <file>1080Ptext.png</file>
+    <file>BGD.png</file>
+    <file>BGL.png</file>
+    <file>BGMAIN.jpg</file>
+    <file>BG-PC.jpg</file>
+    <file>confirm.png</file>
+    <file>cross.png</file>
+    <file>diskette.png</file>
+    <file>DRKMODE.png</file>
+    <file>LHTMODE.png</file>
+    <file>logo.png</file>
+    <file>logout.png</file>
+    <file>TRAVEL-D.png</file>
+    <file>TRAVEL-L.png</file>
+    <file>USER.png</file>
+    <file>warning.png</file>
+    <file>WITH-D.png</file>
+    <file>WITH-L.png</file>
+  </qresource>
+</RCC>
