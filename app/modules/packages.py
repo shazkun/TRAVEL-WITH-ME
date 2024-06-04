@@ -38,6 +38,7 @@ class PackageWindow(QDialog):
         self.table_flags()
         
         self.load_packages()
+        self.main = PackageAddPrompt()
 
     def table_flags(self):
         self.table_widget.setEditTriggers(QTableWidget.NoEditTriggers)
@@ -58,35 +59,17 @@ class PackageWindow(QDialog):
                 self.table_widget.setItem(row_position, col, QTableWidgetItem(str(data)))
 
     def add_package(self):
-        self.main = PackageAddPrompt()
-        if self.main.exec_() == QDialog.Accepted:
-            i = self.main.load()
-            self.db.insert_package(self.user_id, i[0], i[1], i[2])
-            self.load_packages()
-
-
-    # def update_package(self):
-    #     self.main = PackageAddPrompt()
-    #     selected_items = self.table_widget.selectedItems()
-    #     if not selected_items:
-    #         QMessageBox.warning(self, 'No Selection', 'Please select an item to update.')
-    #         return
-
-    #     selected_row = self.table_widget.currentRow()
-    #     package_id = int(self.table_widget.item(selected_row, 0).text())  # Assuming the first column is the package ID
-    #     package_type = self.main.package_2.text()
-    #     destination = self.main.destination.text()
-    #     cost = self.main.cost.text()
-    #     i = self.db.fetch_user_packages_one(self.user_id, package_id)  
-    #     self.main.package_2.setText(i.get('package_type', ''))
-    #     self.main.destination.setText(i.get('destination', ''))
-    #     self.main.cost.setText(i.get('cost', ''))
-    #     if self.main.exec_() == QDialog.Accepted:
-    #         self.db.update_package(package_id, package_type, destination, cost)
-    #         self.load_packages()
+        if self.main.exec_() == QDialog.Accepted:  
+            if self.main.cost.text() == '':
+                QMessageBox.warning(self, 'Add package Failed', 'All fields are required')
+                return
+            else:
+                i = self.main.load()
+                self.db.insert_package(self.user_id, i[0], i[1], i[2])
+                self.load_packages()
     
     def update_package(self):
-        selected_items = self.tableWidget.selectedItems()
+        selected_items = self.tableWidget.selectedItems() 
         if selected_items:
             selected_row = selected_items[0].row()
             # Assuming client_id is in the first column
@@ -109,6 +92,7 @@ class PackageWindow(QDialog):
                     cost = edit_dialog.cost.text()
                     self.db.update_package(package_id, package_type, destination, cost)
                     self.load_packages()  # Reload clients after editing
+                    self.db.insert_logs(self.user_id, date_today, time_today, 'update package')
             
         else:
             QMessageBox.warning(self, 'No Selection',
@@ -122,15 +106,15 @@ class PackageWindow(QDialog):
 
         dialog = ConfirmPrompt()
         dialog.setWindowTitle("Delete")
-        pixmap = QPixmap('icons/warning.png')
+        pixmap = QPixmap(str(Path(__file__).resolve().parent / 'icons/warning.png'))
         dialog.setCustomPixMap(pixmap, 1)
         if selected_items:
             if dialog.exec_() == QDialog.Accepted:
                 package_id = self.table_widget.item(selected_row, 0).text()
-                self.db.delete_package(package_id, self.user_id)
-                self.db.insert_logs(self.user_id, date_today, time_today, 'delete package')
-                self.load_packages()
         
+                self.db.delete_package(package_id, self.user_id)
+                self.load_packages()
+                 
             else:
                 pass
         else:
@@ -163,19 +147,14 @@ class LogsWindow(QDialog):
         self.table_widget = self.findChild(QTableWidget, 'tableWidget')
         self.load_logs()
         self.table_flags()
-        
-
-
-
         self.okbtn.clicked.connect(self.ok_btn)
         self.delbtn.clicked.connect(self.delete_logs)
-
         
     def table_flags(self):
         self.table_widget.setEditTriggers(QTableWidget.NoEditTriggers)
         header = self.table_widget.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.Stretch)
-
+        self.table_widget.setColumnHidden(0, True)
 
     def delete_logs(self):
         selected_items = self.table_widget.selectedItems()
@@ -187,7 +166,7 @@ class LogsWindow(QDialog):
         if selected_items:
             if dialog.exec_() == QDialog.Accepted:
                 package_id = self.table_widget.item(selected_row, 0).text()
-                self.db.delete_package(package_id)
+                self.db.delete_logs(package_id)
                 self.load_logs()
             else:
                 pass
@@ -205,7 +184,6 @@ class LogsWindow(QDialog):
             self.table_widget.insertRow(row_position)
             for col, data in enumerate(client):
                 self.table_widget.setItem(row_position, col, QTableWidgetItem(str(data)))
-
 
     def ok_btn(self):
         self.hide()

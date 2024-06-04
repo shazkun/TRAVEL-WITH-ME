@@ -1,7 +1,8 @@
+@import url('https://fonts.googleapis.com/css?family=Poppins');
 QMainWindow {
     border-image: url(:/img/BGMAIN.jpg);
+    font-family: 'Poppins' sans-serif;
 }
-
 QFrame#frame_2,
 #frame_3 {
     background-color: #24293e;

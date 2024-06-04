@@ -76,6 +76,11 @@ QLabel[info=&quot;true&quot;] {
      </attribute>
      <column>
       <property name="text">
+       <string>ID</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
        <string>DATE</string>
       </property>
      </column>

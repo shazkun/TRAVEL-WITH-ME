@@ -239,15 +239,15 @@ class DatabaseHandler:
         try:
             self.cursor.execute("UPDATE packages SET package_type = ?, destination = ?, cost = ? WHERE id = ?",
                                 (package_type, destination, cost, package_id))
-            self.insert_logs(self.user_id, date_today, time_today, 'update package')
+            self.insert_logs(package_id, date_today, time_today, 'update package')
             self.conn.commit()
         except Exception as e:
             print("An error occurred while updating package:", e)
 
     def delete_package(self, package_id, user_id):
         try:
-            self.cursor.execute("DELETE FROM packages WHERE id = ? AND user_id", (package_id,user_id))
-            self.insert_logs(user_id,date_today, time_today,'delete client')
+            self.cursor.execute("DELETE FROM packages WHERE id = ? AND user_id = ?", (package_id,user_id))
+            self.insert_logs(user_id, date_today,time_today,'delete package')
             self.conn.commit()
         except Exception as e:
             print("An error occurred while deleting package:", e)
@@ -263,7 +263,7 @@ class DatabaseHandler:
     def fetch_data(self, user_id):
         try:
             self.cursor.execute(
-                "SELECT date,time,action FROM logs WHERE user_id = ?", (user_id,))
+                "SELECT id, date,time,action FROM logs WHERE user_id = ?", (user_id,))
             return self.cursor.fetchall()
         except Exception as e:
             print("An error occurred while fetching data:", e)

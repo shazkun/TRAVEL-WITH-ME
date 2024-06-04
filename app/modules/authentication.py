@@ -46,14 +46,9 @@ class AuthWindow(QMainWindow, BaseWindow):
         self.stackedWidget.setCurrentWidget(self.stackedWidget.findChild(QWidget, "loginpage"))
     def register1(self):
         self.stackedWidget.setCurrentWidget(self.stackedWidget.findChild(QWidget, "registerpage"))
-
     def login(self):
         username = self.username.text().lower()
         password = self.password.text()
-
-        if not username or not password:
-            QMessageBox.warning(self, 'Login Failed', 'All fields are required')
-            return
 
         user_id = self.db.login_user(username, password)
         if user_id:
@@ -66,6 +61,13 @@ class AuthWindow(QMainWindow, BaseWindow):
         password = self.register_password.text()
         confirm_password = self.confirm_password.text()
 
+        if len(username) < 4:
+            QMessageBox.warning(self, 'Registration Failed', 'Username must be at least 4 characters long.')
+            return
+        if len(password) < 8:
+            QMessageBox.warning(self, 'Registration Failed', 'Password must be at least 8 characters long.')
+            return
+
         if not username or not password or not confirm_password:
             QMessageBox.warning(self, 'Registration Failed', 'All fields are required')
             return
@@ -76,7 +78,7 @@ class AuthWindow(QMainWindow, BaseWindow):
 
         success = self.db.register_user(username, password)
         if success:
-            QMessageBox.information(self, 'Registration Successful', 'You can now log in')
+            self.register_success()
         else:
             QMessageBox.warning(self, 'Registration Failed', 'Username already exists')
     def register_success(self):
@@ -90,10 +92,10 @@ class AuthWindow(QMainWindow, BaseWindow):
     def setBackground(self, user_id):
         getvalue = self.db.get_bg(user_id)
         if getvalue == True:
-            with open(Path(__file__).resolve().parent /"css/auth_dark.css", "r") as file:
+            with open(str(Path(__file__).resolve().parent /"css/auth_dark.css"), "r") as file:
                 self.setStyleSheet(file.read())
            
         if getvalue == False:
-            with open(Path(__file__).resolve().parent /"css/auth_light.css", "r") as file:
+            with open(str(Path(__file__).resolve().parent /"css/auth_light.css"), "r") as file:
                 self.setStyleSheet(file.read())
         
