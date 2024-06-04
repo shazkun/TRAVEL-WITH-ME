@@ -98,4 +98,3 @@ class AuthWindow(QMainWindow, BaseWindow):
         if getvalue == False:
             with open(str(Path(__file__).resolve().parent /"css/auth_light.css"), "r") as file:
                 self.setStyleSheet(file.read())
-        

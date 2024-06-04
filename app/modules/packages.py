@@ -2,11 +2,9 @@ from PyQt5.QtWidgets import *
 from PyQt5 import uic
 from pathlib import Path
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QPixmap, QIcon
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtGui import QPixmap, QIntValidator
+from PyQt5.QtCore import Qt, QRegExp
 from modules.prompts import *
-import sys
 import modules.icons.resources_rc
 from modules.database import *
 import modules.authentication
@@ -37,8 +35,11 @@ class PackageWindow(QDialog):
         self.delbtn.clicked.connect(self.delete_package)
         self.table_flags()
         
+
         self.load_packages()
-        self.main = PackageAddPrompt()
+        self.main = PackageAddPrompt(self.db, self.user_id, self.table_widget)
+        client_validator = QIntValidator(0,2147483647)  # Set the range from 0 to 9999999999
+        self.main.cost.setValidator(client_validator)
 
     def table_flags(self):
         self.table_widget.setEditTriggers(QTableWidget.NoEditTriggers)
@@ -48,6 +49,13 @@ class PackageWindow(QDialog):
 
     def ok_btn(self):
         self.hide()
+    
+    def add_package(self):
+        self.main.show()
+        self.main.package_2.clear()
+        self.main.destination.clear()
+        self.main.cost.clear()
+        self.main.setWindowModality(Qt.ApplicationModal)
 
     def load_packages(self):
         self.table_widget.setRowCount(0)  # Clear existing rows
@@ -58,15 +66,6 @@ class PackageWindow(QDialog):
             for col, data in enumerate(client):
                 self.table_widget.setItem(row_position, col, QTableWidgetItem(str(data)))
 
-    def add_package(self):
-        if self.main.exec_() == QDialog.Accepted:  
-            if self.main.cost.text() == '':
-                QMessageBox.warning(self, 'Add package Failed', 'All fields are required')
-                return
-            else:
-                i = self.main.load()
-                self.db.insert_package(self.user_id, i[0], i[1], i[2])
-                self.load_packages()
     
     def update_package(self):
         selected_items = self.tableWidget.selectedItems() 
@@ -81,7 +80,7 @@ class PackageWindow(QDialog):
                     'destination': self.tableWidget.item(selected_row, 2).text(),
                     'cost': self.tableWidget.item(selected_row, 3).text()
                 }
-                edit_dialog = PackageAddPrompt()
+                edit_dialog = PackageAddPrompt(self.db, self.user_id)
                 edit_dialog.package_2.setText(current_details['package_type'])
                 edit_dialog.destination.setText(current_details['destination'])
                 edit_dialog.cost.setText(current_details['cost'])
@@ -127,14 +126,40 @@ class PackageWindow(QDialog):
 
 
 class PackageAddPrompt(QDialog):
-    def __init__(self):
+    def __init__(self, db, user_id, table):
         super(PackageAddPrompt, self).__init__()
         main_ui_path = Path(__file__).resolve().parent / 'ui/p_forms.ui'
         uic.loadUi(main_ui_path, self)
-        self.savebutton.clicked.connect(self.accept)
-        self.cancelbutton.clicked.connect(self.reject)
-    def load(self):
-        return [self.package_2.text(), self.destination.text(), self.cost.text()]
+        self.savebutton.clicked.connect(self.add_package)
+        self.cancelbutton.clicked.connect(self.hide)
+        self.db = db
+        self.user_id = user_id
+        self.table= table
+    def load_packages(self):
+        self.table.setRowCount(0)  # Clear existing rows
+        clients = self.db.fetch_user_packages(self.user_id)
+        for client in clients:
+            row_position = self.table.rowCount()
+            self.table.insertRow(row_position)
+            for col, data in enumerate(client):
+                self.table.setItem(row_position, col, QTableWidgetItem(str(data)))
+    def add_package(self):
+        package = self.package_2.text()
+        destination = self.destination.text()
+        cost = self.cost.text()
+        dialog = SavePrompt()
+        if dialog.exec_() == QDialog.Accepted:
+            if self.cost.text() == '' or self.package_2.text() == '' or self.destination.text() == '':
+                QMessageBox.warning(self, 'Add package Failed', 'All fields are required')
+            else:
+                self.db.insert_package(self.user_id, package, destination, cost)
+                self.load_packages()
+                self.accept() 
+    
+    def cancelbtn(self):
+        self.hide()
+
+   
 
 
 class LogsWindow(QDialog):

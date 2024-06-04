@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import *
 from PyQt5 import uic
 from pathlib import Path
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QPixmap,QIcon, QRegExpValidator
+from PyQt5.QtGui import QPixmap,QIcon, QRegExpValidator, QIntValidator
 from PyQt5.QtCore import Qt, QRegExp,QEvent
 from PyQt5.QtWidgets import QWidget
 from modules.prompts import *
@@ -30,8 +30,10 @@ class ClientWindow(QDialog, BaseWindow):
         self.cancelbutton.clicked.connect(self.cancel_btn)
         self.savebutton.clicked.connect(self.save_btn)
         self.date.setText(self.sel_date)
-        phone_validator = QRegExpValidator(QRegExp(r'^\d{10}$'))  # Regular expression for a 10-digit phone number
+        phone_validator = QRegExpValidator(QRegExp(r'^\d{10}$'))
+        client_validator = QIntValidator(1, 999999999)  # Regular expression for a 10-digit phone number
         self.contact.setValidator(phone_validator)
+        self.pax.setValidator(client_validator)
         self.typeCbox.currentIndexChanged.connect(self.selection_changed)
         self.selection_changed()
         self.package_selector()
@@ -193,9 +195,6 @@ class EditClientWindow(QDialog):
         destination = self.destination.text()
         cost = self.cost.text()
         if dialog.exec_() == QDialog.Accepted:
-            # if not name or not contact or not date or not time or not pax or not location or not type or not destination:
-            #     QMessageBox.warning(self, 'Update Client Failed', 'All fields are required')
-            #     return
             self.db.update_client(self.user_id, self.client_id, name, contact, date, time, pax, location, type, destination, cost)
             self.accept()  # Close the dialog 
             self.lclients()
@@ -296,7 +295,6 @@ class ScheduleWindow(QDialog):
             c_id = client[0]
             location = client[6]
             destination = client[-1]  # Adjust index according to your data structure
-            
             item_text = f"ID: {c_id} Location: {location} Destination: {destination}"
             list_item = QListWidgetItem(item_text)
             self.listWidget.addItem(list_item)

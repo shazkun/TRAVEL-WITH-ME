@@ -5,8 +5,6 @@ from PyQt5.QtGui import QIcon
 from modules.start import *
 import sys
 
-
-
         
 if __name__ == "__main__":
     app = QApplication(sys.argv)

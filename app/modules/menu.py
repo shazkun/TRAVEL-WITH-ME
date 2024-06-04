@@ -121,19 +121,8 @@ class Main(QMainWindow, BaseWindow):
 
     def calendarDateChanged(self):
         selected = self.calendarWidget.selectedDate().toString("yyyy-MM-dd")
-    #     self.updateScheduleList(selected)
         self.load_profiles(selected)
 
-    # def updateScheduleList(self, date):
-    #     self.listWidget.clear()  # Clear existing items
-    #     clients = self.db.fetch_user_clients_by_date(self.user_id, date)
-    #     for client in clients:
-    #         c_id = client[0]
-    #         destination = client[-1]  # Adjust index according to your data structure
-    #         location = client[6]
-    #         item_text = f"{c_id} Location: {location} Destination: {destination}"
-    #         list_item = QListWidgetItem(item_text)
-    #         self.listWidget.addItem(list_item)
     def load_profiles(self, date):
         self.clear_layout(self.profile_layout)
         clients = self.db.fetch_user_clients_by_date(self.user_id, date)
@@ -174,7 +163,7 @@ class Main(QMainWindow, BaseWindow):
 
     def view_packages(self):
         self.main = PackageWindow(self.db, self.user_id)
-        self.main.setWindowModality(Qt.ApplicationModal)
+        # self.main.setWindowModality(Qt.ApplicationModal)
         self.main.show()
 
     def view_logs(self):
@@ -183,7 +172,6 @@ class Main(QMainWindow, BaseWindow):
         self.main.show()
 
     # UPDATE FUNCTION
-
     def edit_client(self):
         selected_items = self.tableWidget.selectedItems()
         checkpackage =  self.db.fetch_user_packages(self.user_id)
