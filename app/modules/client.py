@@ -18,14 +18,14 @@ current_datetime = datetime.datetime.now()
 date_today = current_datetime.strftime("%Y-%m-%d")
 time_today = current_datetime.strftime("%H:%M:%S")
 class ClientWindow(QDialog, BaseWindow):
-    def __init__(self, table, db, user_id, selected_date):
+    def __init__(self, table, user_id, selected_date):
         super(ClientWindow, self).__init__()
         main_ui_path = Path(__file__).resolve().parent / 'ui/client.ui'
         uic.loadUi(main_ui_path, self)
         self.table = table
         self.sel_date = selected_date
 
-        self.db= db
+        self.db= DatabaseHandler()
         self.user_id = user_id
         self.cancelbutton.clicked.connect(self.cancel_btn)
         self.savebutton.clicked.connect(self.save_btn)
@@ -82,7 +82,7 @@ class ClientWindow(QDialog, BaseWindow):
     def cancel_btn(self):
         dialog = ExitPrompt()
         if dialog.exec_() == QDialog.Accepted:
-            self.back_date = ScheduleWindow(self.table, self.db,self.user_id)
+            self.back_date = ScheduleWindow(self.table,self.user_id)
             self.back_date.show()
             self.hide()
         else:
@@ -114,13 +114,13 @@ class ClientWindow(QDialog, BaseWindow):
             pass
         
 class EditClientWindow(QDialog):
-    def __init__(self, db, user_id, client_id, selected_date, table):
+    def __init__(self, user_id, client_id, selected_date, table):
         super(EditClientWindow, self).__init__()
         main_ui_path = Path(__file__).resolve().parent / 'ui/client.ui'
         uic.loadUi(main_ui_path, self)
         self.setWindowTitle('Edit Client Details')
        
-        self.db = db
+        self.db = DatabaseHandler()
         self.table = table
         self.user_id = user_id
         self.client_id = client_id
@@ -216,25 +216,25 @@ class EditClientWindow(QDialog):
         if dialog.exec_() == QDialog.Accepted:
             self.hide()
         else:
-            self.main = ScheduleWindow(self.tableWidget, self.db, self.user_id)
-            self.main.setWindowModality(Qt.ApplicationModal)
-            self.main.show()
+            # self.main = ScheduleWindow(self.table, self.db, self.user_id)
+            # self.main.setWindowModality(Qt.ApplicationModal)
+            # self.main.show()
+            pass
             
 
         
 
         
 class ScheduleWindow(QDialog):
-    def __init__(self, table, db, user_id):
+    def __init__(self, table, user_id):
         super(ScheduleWindow, self).__init__()
         main_ui_path = Path(__file__).resolve().parent / 'ui/schedule.ui'
         uic.loadUi(main_ui_path, self)
         self.table = table
-        self.db = db
+        self.db = DatabaseHandler()
         self.user_id = user_id
         self.calendarWidget.clicked.connect(self.calendarDateChanged)
         self.okbtn.clicked.connect(self.add_client)
-        self.okbtn.clicked.connect(self.update)
         self.calendarDateChanged()
         
         self.updatebtn.clicked.connect(self.update_client_button)
@@ -247,7 +247,7 @@ class ScheduleWindow(QDialog):
 
     def add_client(self):
         selected_date = self.calendarWidget.selectedDate().toString("yyyy-MM-dd")
-        self.menu = ClientWindow(self.table, self.db, self.user_id, selected_date)
+        self.menu = ClientWindow(self.table, self.user_id, selected_date)
         self.menu.selection_changed()
         self.menu.show()
        
@@ -272,7 +272,7 @@ class ScheduleWindow(QDialog):
             QMessageBox.warning(self, 'Client Not Found', 'Client details not found for the selected client ID.')
 
     def update_client(self, client_id, current_details, selected_date):
-        self.menu = EditClientWindow(self.db, self.user_id, client_id, selected_date, self.table)
+        self.menu = EditClientWindow(self.user_id, client_id, selected_date, self.table)
         if current_details:
             self.menu.name.setText(current_details.get('name', ''))
             self.menu.contact.setText(current_details.get('contact', ''))
@@ -290,12 +290,13 @@ class ScheduleWindow(QDialog):
     
     def list_clients(self, selected_date):
         self.listWidget.clear()  # Clear existing items
-        clients = self.db.fetch_user_clients_by_date(self.user_id, selected_date)
+        clients = self.db.fetch_user_client_by_time(self.user_id, selected_date)
         for client in clients:
             c_id = client[0]
-            location = client[6]
-            destination = client[-1]  # Adjust index according to your data structure
-            item_text = f"ID: {c_id} Location: {location} Destination: {destination}"
+            location = client[7]
+            time = client[5]
+            destination = client[9]  # Adjust index according to your data structure
+            item_text = f"ID: {c_id} Location: {location} Destination: {destination} Time: {time}"
             list_item = QListWidgetItem(item_text)
             self.listWidget.addItem(list_item)
 

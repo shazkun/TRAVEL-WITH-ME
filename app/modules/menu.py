@@ -46,6 +46,7 @@ class Main(QMainWindow, BaseWindow):
         self.setBackground()
         self.abg = modules.authentication.AuthWindow()
         self.abg.setBackground(self.user_id)
+        self.tabWidget.tabBarClicked.connect(self.load_clients)
 
     def table_flags(self):
         self.tableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
@@ -131,7 +132,7 @@ class Main(QMainWindow, BaseWindow):
         col = 0
         clients = self.db.fetch_user_clients_by_date(self.user_id, date)
         for user in clients:
-            userProfileWidget = UserProfileWidget(str(user[0]), str(profileImagePath), self.user_id, self.db)
+            userProfileWidget = UserProfileWidget(str(user[0]), str(profileImagePath), self.user_id)
             if user:
                 self.profile_layout.addWidget(userProfileWidget, row, col)
             else:
@@ -154,7 +155,7 @@ class Main(QMainWindow, BaseWindow):
     def add_client(self):
         checkpackage =  self.db.fetch_user_packages(self.user_id)
         if len(checkpackage) != 0:
-            self.main = ScheduleWindow(self.tableWidget, self.db, self.user_id)
+            self.main = ScheduleWindow(self.table_widget, self.user_id)
             self.main.setWindowModality(Qt.ApplicationModal)
             self.main.show()
         else:
@@ -162,12 +163,12 @@ class Main(QMainWindow, BaseWindow):
                                     'Please add package first.')
 
     def view_packages(self):
-        self.main = PackageWindow(self.db, self.user_id)
+        self.main = PackageWindow(self.user_id)
         # self.main.setWindowModality(Qt.ApplicationModal)
         self.main.show()
 
     def view_logs(self):
-        self.main = LogsWindow(self.user_id, self.db)
+        self.main = LogsWindow(self.user_id)
         self.main.setWindowModality(Qt.ApplicationModal)
         self.main.show()
 
@@ -194,7 +195,7 @@ class Main(QMainWindow, BaseWindow):
                         'cost': self.tableWidget.item(selected_row, 9).text()
                     }
                     edit_dialog = EditClientWindow(
-                        self.db, self.user_id, client_id, None, self.table_widget)
+                        self.user_id, client_id, None, self.table_widget)
                  
                     edit_dialog.name.setText(current_details['name'])
                     edit_dialog.contact.setText(current_details['contact'])
@@ -205,9 +206,9 @@ class Main(QMainWindow, BaseWindow):
                     edit_dialog.typeCbox.setCurrentText(f"ID: {client_id} {current_details['type']}")
                     edit_dialog.destination.setText(current_details['destination'])
                     edit_dialog.cost.setText(current_details['cost'])
-
+                    
                     if edit_dialog.exec_() == QDialog.Accepted:
-                        self.load_clients()  # Reload clients after editing
+                       
                         self.db.update_client(current_details['name'],
                                               current_details['contact'],
                                               current_details['date'],
@@ -219,6 +220,8 @@ class Main(QMainWindow, BaseWindow):
                                               self.user_id,
                                               client_id,
                                               current_details['cost'] )
+                        self.load_clients()  # Reload clients after editing
+                       
                       
             else:
                 QMessageBox.warning(self, 'No Selection',
@@ -274,12 +277,12 @@ class Main(QMainWindow, BaseWindow):
 
 
 class UserProfileWidget(QFrame):
-    def __init__(self, userName, profileImagePath, user_id, db):
+    def __init__(self, userName, profileImagePath, user_id):
         super().__init__()
         self.userName = userName
         self.profileImagePath = profileImagePath
         self.user_id = user_id
-        self.db = db
+        self.db = DatabaseHandler()
 
         # Load the profile image and scale it to fit within 50x50 without cropping
         pixmap = QPixmap(profileImagePath)

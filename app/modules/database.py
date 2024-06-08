@@ -36,7 +36,7 @@ class DatabaseHandler:
         """)
         self.cursor.execute("""
         CREATE TABLE IF NOT EXISTS packages (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,                 
             user_id INTEGER,
             package_type TEXT NOT NULL,
             destination TEXT NOT NULL,
@@ -141,6 +141,24 @@ class DatabaseHandler:
         except Exception as e:
             print("An error occurred while fetching user clients by date:", e)
             return []
+    def fetch_user_client_by_time(self, user_id, date):
+        # Prepare the SQL query with a WHERE clause and an ORDER BY clause
+        self.cursor.execute('''
+                    SELECT * FROM clients
+                    WHERE user_id = ?  AND date = ?
+                    ORDER BY
+                        CASE
+                            WHEN time LIKE '%am' AND LENGTH(time) = 3 THEN SUBSTR(time, 1, 1)
+                            WHEN time LIKE '%am' AND LENGTH(time) = 4 THEN SUBSTR(time, 1, 2)
+                            WHEN time = '12pm' THEN 12
+                            WHEN time LIKE '%pm' AND LENGTH(time) = 3 THEN CAST(SUBSTR(time, 1, 1) AS INTEGER) + 12
+                            WHEN time LIKE '%pm' AND LENGTH(time) = 4 THEN CAST(SUBSTR(time, 1, 2) AS INTEGER) + 12
+                        END
+                    ''', (user_id, date))
+        # Fetch and return all the matching records
+        return self.cursor.fetchall()
+
+
 
     def fetch_user_clients_one(self, user_id, cid):
         try:
@@ -235,22 +253,42 @@ class DatabaseHandler:
             print("An error occurred while getting packages:", e)
             return []
 
-    def update_package(self, package_id, package_type, destination, cost):
+    def update_package(self, user_id, package_id, package_type, destination, cost):
         try:
             self.cursor.execute("UPDATE packages SET package_type = ?, destination = ?, cost = ? WHERE id = ?",
                                 (package_type, destination, cost, package_id))
+            self.cursor.execute("""
+                UPDATE clients
+                SET type = ?, destination = ?, cost = ?
+                WHERE user_id = ? AND type = ? AND destination = ? AND cost = ?
+            """, (package_type, destination, cost, user_id, package_type, destination, cost))
             self.insert_logs(package_id, date_today, time_today, 'update package')
             self.conn.commit()
         except Exception as e:
             print("An error occurred while updating package:", e)
 
-    def delete_package(self, package_id, user_id):
+    def delete_package(self, package_id, user_id, p_type, cost, dt):
         try:
             self.cursor.execute("DELETE FROM packages WHERE id = ? AND user_id = ?", (package_id,user_id))
+            self.cursor.execute("DELETE FROM clients WHERE user_id = ? AND type = ? AND cost = ? AND destination = ?", (user_id, p_type,cost, dt ))
             self.insert_logs(user_id, date_today,time_today,'delete package')
             self.conn.commit()
         except Exception as e:
             print("An error occurred while deleting package:", e)
+    def package_exists(self, user_id, package_type, cost):
+        try:
+            query = """
+            SELECT COUNT(*)
+            FROM packages
+            WHERE user_id = ? AND (package_type = ? AND cost = ?)
+            """
+            self.cursor.execute(query, (user_id, package_type, cost))
+            result = self.cursor.fetchone()
+            return result[0] > 0
+        except Exception as e:
+            print("An error occurred while checking if package exists:", e)
+            return False
+
 #LOGS----------------------------------------------
 
     def insert_logs(self, user_id, date, time, action):
