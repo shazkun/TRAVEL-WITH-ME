@@ -260,7 +260,7 @@ QLabel[info=&quot;true&quot;] {
        <widget class="QComboBox" name="typeCbox">
         <property name="styleSheet">
          <string notr="true">  QComboBox {
-                padding-left: 160px;
+                padding-left: 10px;
             }
  QComboBox QAbstractItemView {
                 text-align: center;

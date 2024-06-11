@@ -57,6 +57,8 @@ class DatabaseHandler:
             type TEXT NOT NULL,
             destination TEXT NOT NULL,
             cost TEXT NOT NULL,
+            pid INTEGER,
+            FOREIGN KEY (user_id) REFERENCES users (pid)
             FOREIGN KEY (user_id) REFERENCES users (id)
         )
         ''')
@@ -111,12 +113,12 @@ class DatabaseHandler:
             return None
 # CLIENTS-----------------------------------------------------------------
 
-    def insert_client(self, user_id, name, contact, date, time, pax, location, type, destination, cost):
+    def insert_client(self, user_id, name, contact, date, time, pax, location, type, destination, cost, pid):
         try:
             self.cursor.execute('''
-                INSERT INTO clients (user_id, name, contact, date, time, pax, location, type, destination, cost)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (user_id, name, contact, date, time, pax, location, type, destination, cost))
+                INSERT INTO clients (user_id, name, contact, date, time, pax, location, type, destination, cost, pid)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (user_id, name, contact, date, time, pax, location, type, destination, cost, pid))
             self.insert_logs(user_id, date_today, time_today,'add client')
             self.conn.commit()
         except Exception as e:
@@ -125,7 +127,7 @@ class DatabaseHandler:
     def fetch_user_clients(self, user_id):
         try:
             self.cursor.execute(
-                "SELECT id, name, contact, date, time, pax, location, type, destination, cost FROM clients WHERE user_id = ?", (user_id,))
+                "SELECT id, name, contact, date, time, pax, location, type, destination, cost, pid FROM clients WHERE user_id = ?", (user_id,))
             return self.cursor.fetchall()
         except Exception as e:
             print("An error occurred while fetching user clients:", e)
@@ -176,13 +178,13 @@ class DatabaseHandler:
             print("An error occurred while fetching user clients one:", e)
             return None
 
-    def update_client(self, user_id, client_id, name, contact, date, time, pax, location, type, destination, cost):
+    def update_client(self, user_id, client_id, name, contact, date, time, pax, location, type, destination, cost, pid):
         try:
             self.cursor.execute("""
                 UPDATE clients
-                SET name = ?, contact = ?, date = ?, time = ?, pax = ?, location = ?, type = ?, destination = ?, cost = ?
+                SET name = ?, contact = ?, date = ?, time = ?, pax = ?, location = ?, type = ?, destination = ?, cost = ?, pid = ?
                 WHERE user_id = ? AND id = ?""",
-                                (name, contact, date, time, pax, location, type, destination, cost,user_id, client_id ))
+                                (name, contact, date, time, pax, location, type, destination, cost,pid ,user_id, client_id))
             self.insert_logs(user_id,date_today, time_today,'update client')
             self.conn.commit()
         except Exception as e:
@@ -236,6 +238,7 @@ class DatabaseHandler:
         except Exception as e:
             print("An error occurred while fetching user package by id:", e)
             return None
+    
 
     def get_packages(self, user_id):
         try:
@@ -252,16 +255,14 @@ class DatabaseHandler:
         except Exception as e:
             print("An error occurred while getting packages:", e)
             return []
+        
 
-    def update_package(self, user_id, package_id, package_type, destination, cost):
+    def update_package(self, user_id, package_id, package_type, destination, cost,old_type, old_des, old_cost):
         try:
             self.cursor.execute("UPDATE packages SET package_type = ?, destination = ?, cost = ? WHERE id = ?",
                                 (package_type, destination, cost, package_id))
-            self.cursor.execute("""
-                UPDATE clients
-                SET type = ?, destination = ?, cost = ?
-                WHERE user_id = ? AND type = ? AND destination = ? AND cost = ?
-            """, (package_type, destination, cost, user_id, package_type, destination, cost))
+            self.cursor.execute("UPDATE clients SET type = ?, destination = ?, cost = ? WHERE user_id = ? AND type = ? AND destination = ? AND  cost = ?", 
+                                (package_type, destination, cost, user_id, old_type, old_des, old_cost))
             self.insert_logs(package_id, date_today, time_today, 'update package')
             self.conn.commit()
         except Exception as e:

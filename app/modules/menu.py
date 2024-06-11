@@ -53,6 +53,7 @@ class Main(QMainWindow, BaseWindow):
         header = self.table_widget.horizontalHeader()
         header.setSectionResizeMode(QHeaderView.Stretch)
         self.table_widget.setColumnHidden(0, True)
+        self.table_widget.setColumnHidden(10, True)
 
     # LOAD CLIENTS
 
@@ -192,7 +193,8 @@ class Main(QMainWindow, BaseWindow):
                         'location': self.tableWidget.item(selected_row, 6).text(),
                         'type': self.tableWidget.item(selected_row, 7).text(),
                         'destination': self.tableWidget.item(selected_row, 8).text(),
-                        'cost': self.tableWidget.item(selected_row, 9).text()
+                        'cost': self.tableWidget.item(selected_row, 9).text(),
+
                     }
                     edit_dialog = EditClientWindow(
                         self.user_id, client_id, None, self.table_widget)
@@ -206,6 +208,10 @@ class Main(QMainWindow, BaseWindow):
                     edit_dialog.typeCbox.setCurrentText(f"ID: {client_id} {current_details['type']}")
                     edit_dialog.destination.setText(current_details['destination'])
                     edit_dialog.cost.setText(current_details['cost'])
+                    type_cbox = edit_dialog.typeCbox.currentText() 
+                    findpid = re.search(r'\d+', type_cbox)
+                    pid = findpid.group()
+           
                     
                     if edit_dialog.exec_() == QDialog.Accepted:
                        
@@ -219,7 +225,8 @@ class Main(QMainWindow, BaseWindow):
                                               current_details['destination'],
                                               self.user_id,
                                               client_id,
-                                              current_details['cost'] )
+                                              current_details['cost'],
+                                              pid)
                         self.load_clients()  # Reload clients after editing
                        
                       
